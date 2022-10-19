@@ -3,17 +3,46 @@ const jwt = require('jsonwebtoken')
 
 const { Blog, User } = require('../models')
 const { SECRET } = require('../util/config')
+const { Op } = require('sequelize')
 
 // get all the blogs
 router.get('/', async (req, res) => {
-    const blogs = await Blog.findAll({
-        attributes: { exclude: ['userId'] },
-        include: {
-            model: User,
-            attributes: ['name']
-        }
-    })
-    res.json(blogs)        
+
+    // get blogs with search parameter set
+    if (req.query.search) {
+        const blogs = await Blog.findAll({
+            attributes: { exclude: ['userId'] },
+            include: {
+                model: User,
+                attributes: ['name']
+            },
+            where: {
+                [Op.or]: [
+                    {
+                        title: {
+                            [Op.substring]: req.query.search
+                        }
+                    },
+                    {
+                        author: {
+                            [Op.substring]: req.query.search
+                        }
+                    }
+                ]
+            }
+        })
+        res.json(blogs)
+    } else { // get all blogs
+        const blogs = await Blog.findAll({
+            attributes: { exclude: ['userId'] },
+            include: {
+                model: User,
+                attributes: ['name']
+            }
+        })
+        res.json(blogs)   
+    }
+     
 })
 
 // decode token
