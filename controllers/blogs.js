@@ -8,7 +8,7 @@ const { Op } = require('sequelize')
 // get all the blogs
 router.get('/', async (req, res) => {
 
-    // get blogs with search parameter set
+    // get blogs with search parameter set, based on likes descending order
     if (req.query.search) {
         const blogs = await Blog.findAll({
             attributes: { exclude: ['userId'] },
@@ -29,16 +29,23 @@ router.get('/', async (req, res) => {
                         }
                     }
                 ]
-            }
+            },
+            order: [
+                ['likes', 'DESC']
+            ]
+
         })
         res.json(blogs)
-    } else { // get all blogs
+    } else { // get all blogs based on likes descending order
         const blogs = await Blog.findAll({
             attributes: { exclude: ['userId'] },
             include: {
                 model: User,
                 attributes: ['name']
-            }
+            },
+            order: [ 
+                ['likes', 'DESC']
+            ]
         })
         res.json(blogs)   
     }
