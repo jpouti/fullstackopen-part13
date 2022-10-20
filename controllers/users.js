@@ -4,10 +4,12 @@ const { User, Blog } = require('../models')
 
 router.get('/', async (req, res) => {
     const users = await User.findAll({
-        include: {
-            model: Blog,
-            attributes: { exclude: ['userId']}
-        }
+        include: [
+            {
+                model: Blog,
+                attributes: { exclude: ['userId']}
+            }
+        ],
     })
     res.json(users)
 })
@@ -33,5 +35,27 @@ router.put('/:username', userFinder, async (req, res) => {
         res.status(400).send({ error: 'User not found' })
     }
 })
+
+// return the user information by id
+router.get('/:id', async (req, res) => {
+    const user = await User.findByPk(req.params.id, {
+        include: [{
+            model: Blog,
+            attributes: { exclude: ['userId'] },
+            through: {
+                attributes: []
+            }
+        }]
+    })
+    if (user) {
+        res.json({
+            username: user.username,
+            name: user.name,
+            readings: user.blogs
+        })
+    } else {
+        res.status(404).end()
+    }
+}) 
 
 module.exports = router
