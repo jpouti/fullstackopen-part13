@@ -50,11 +50,11 @@ module.exports = {
                 type: DataTypes.STRING,
                 allowNull: false
             },
-            createAt: {
+            created_at: {
                 type: DataTypes.DATE,
                 defaultValue: DataTypes.NOW,
             },
-            updatedAt: {
+            updated_at: {
                 type: DataTypes.DATE,
                 defaultValue: DataTypes.NOW,
             },
