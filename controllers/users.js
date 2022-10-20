@@ -40,14 +40,19 @@ router.put('/:username', userFinder, tokenExtractor, async (req, res) => {
 
 // return the user information by id
 router.get('/:id', async (req, res) => {
+    const where = {}
+    if (req.query.read) {
+        where.read = req.query.read
+    }
     const user = await User.findByPk(req.params.id, {
         include: [{
             model: Blog,
             attributes: { exclude: ['userId'] },
             through: {
-                attributes: ['id', 'read']
-            }
-        }]
+                attributes: ['id', 'read'],
+                where
+            },
+        }],
     })
     if (user) {
         res.json({

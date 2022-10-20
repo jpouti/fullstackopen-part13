@@ -17,7 +17,6 @@ router.put('/:id', tokenExtractor, async (req, res) => {
         return res.status(400).send('Updated status missing')
     }
     const readinglist = await ReadingList.findByPk(req.params.id)
-    console.log(readinglist.userId)
     if (req.decodedToken.id === readinglist.userId) {
         readinglist.read = req.body.read
         await readinglist.save()
