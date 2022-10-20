@@ -43,7 +43,7 @@ router.get('/:id', async (req, res) => {
             model: Blog,
             attributes: { exclude: ['userId'] },
             through: {
-                attributes: []
+                attributes: ['id', 'read']
             }
         }]
     })
