@@ -2,7 +2,7 @@ const router = require('express').Router()
 
 const { User, Blog } = require('../models')
 
-const { tokenExtractor } = require('../util/middleware')
+const { tokenExtractor, checkSession } = require('../util/middleware')
 
 router.get('/', async (req, res) => {
     const users = await User.findAll({
@@ -28,7 +28,7 @@ const userFinder = async (req, res, next) => {
 }
 
 // change a username
-router.put('/:username', userFinder, tokenExtractor, async (req, res) => {
+router.put('/:username', userFinder, tokenExtractor, checkSession, async (req, res) => {
     if (req.user) {
         req.user.username = req.body.username
         await req.user.save()

@@ -3,6 +3,7 @@ const router = require('express').Router()
 
 const { SECRET } = require('../util/config')
 const User = require('../models/user')
+const ActiveSession = require('../models/active_session')
 
 // user logging in
 router.post('/', async (req, res) => {
@@ -13,6 +14,12 @@ router.post('/', async (req, res) => {
             username: body.username
         }
     })
+
+    if (user.disabled === true) {
+        return res.status(401).json({
+            error: 'User has been disabled, please contact admin for further details'
+        })
+    }
 
     // for this practice application password is hardcoded same for all users 
     const passwordCorrect = body.password === 'secret'
@@ -30,10 +37,16 @@ router.post('/', async (req, res) => {
 
     const token = jwt.sign(userForToken, SECRET)
 
+    // create new active session when user logs in
+    const session = await ActiveSession.create({
+        userId: user.id
+    })
+
     res.status(200).send({
         token,
         username: user.username,
-        name: user.name
+        name: user.name,
+        expire: session.expire
     })
 })
 

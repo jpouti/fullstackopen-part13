@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken')
 
 const { Blog, User } = require('../models')
 const { Op } = require('sequelize')
-const { tokenExtractor } = require('../util/middleware')
+const { tokenExtractor, checkSession } = require('../util/middleware')
 const { SECRET } = require('../util/config')
 
 // get all the blogs
@@ -54,7 +54,7 @@ router.get('/', async (req, res) => {
 })
 
 // post a new blog
-router.post('/', tokenExtractor, async (req, res) => {
+router.post('/', tokenExtractor, checkSession, async (req, res) => {
     const user = await User.findByPk(req.decodedToken.id)
     const blog = await Blog.create({...req.body, userId: user.id })
     res.json(blog)
@@ -66,7 +66,7 @@ const blogFinder = async (req, res, next) => {
 }
 
 // delete a blog post
-router.delete('/:id', blogFinder, tokenExtractor, async (req, res) => {
+router.delete('/:id', blogFinder, tokenExtractor, checkSession, async (req, res) => {
     const user = await User.findByPk(req.decodedToken.id)
     if (req.blog && req.blog.userId === user.id) {
         await req.blog.destroy()
